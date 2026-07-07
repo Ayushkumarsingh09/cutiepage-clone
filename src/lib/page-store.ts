@@ -30,6 +30,10 @@ async function streamToText(stream: ReadableStream<Uint8Array>) {
   return new TextDecoder().decode(merged);
 }
 
+function blobToken() {
+  return process.env.BLOB_READ_WRITE_TOKEN;
+}
+
 export async function storePage(snapshot: PageSnapshot): Promise<PageSnapshot> {
   const updated: PageSnapshot = {
     ...snapshot,
@@ -42,6 +46,7 @@ export async function storePage(snapshot: PageSnapshot): Promise<PageSnapshot> {
       contentType: "application/json",
       addRandomSuffix: false,
       allowOverwrite: true,
+      token: blobToken(),
     });
     return updated;
   }
@@ -52,7 +57,10 @@ export async function storePage(snapshot: PageSnapshot): Promise<PageSnapshot> {
 export async function loadPage(id: string): Promise<PageSnapshot | null> {
   if (hasBlobStorage()) {
     try {
-      const result = await get(blobPath(id), { access: "private" });
+      const result = await get(blobPath(id), {
+        access: "private",
+        token: blobToken(),
+      });
       if (!result || result.statusCode !== 200 || !result.stream) {
         return null;
       }

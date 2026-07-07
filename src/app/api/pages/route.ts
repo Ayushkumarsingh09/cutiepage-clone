@@ -18,6 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ page: saved, stored: true });
   } catch (error) {
     console.error("Failed to save page:", error);
-    return NextResponse.json({ error: "Failed to save page" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to save page";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
