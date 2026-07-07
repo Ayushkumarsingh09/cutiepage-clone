@@ -7,6 +7,7 @@ import { ArrowLeft, Eye, Rocket, Save } from "lucide-react";
 import { EditorField } from "@/components/editor/EditorField";
 import { ShareModal } from "@/components/editor/ShareModal";
 import {
+  buildFallbackShareUrl,
   buildShareUrl,
   loadDraftLocal,
   saveDraftLocal,
@@ -153,15 +154,24 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
       setSnapshot(published);
 
       const stored = await tryServerSave(published);
-      if (!stored) {
-        setStatus("Publish failed — could not save to server. Try again.");
-        return;
+      let url = buildShareUrl(published);
+
+      if (stored) {
+        const verify = await fetch(`/api/pages/${published.id}`);
+        if (!verify.ok) {
+          url = buildFallbackShareUrl(published);
+        }
+      } else {
+        url = buildFallbackShareUrl(published);
       }
 
-      const url = buildShareUrl(published);
       setShareUrl(url);
       setShareOpen(true);
-      setStatus("Published! Share your short link below.");
+      setStatus(
+        url.includes("#d=")
+          ? "Published! Link ready (backup format)."
+          : "Published! Share your short link below.",
+      );
 
       if (!pageId) {
         router.replace(`/create/${slug}?id=${snapshot.id}`);

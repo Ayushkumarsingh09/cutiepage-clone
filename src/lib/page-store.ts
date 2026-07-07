@@ -1,4 +1,4 @@
-import { head, put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 import type { PageSnapshot } from "@/types";
 import { savePage as savePageFile, getPage as getPageFile } from "./storage";
 
@@ -10,6 +10,24 @@ function blobPath(id: string) {
 
 function hasBlobStorage() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+async function streamToText(stream: ReadableStream<Uint8Array>) {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(value);
+  }
+  const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const merged = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return new TextDecoder().decode(merged);
 }
 
 export async function storePage(snapshot: PageSnapshot): Promise<PageSnapshot> {
@@ -34,11 +52,14 @@ export async function storePage(snapshot: PageSnapshot): Promise<PageSnapshot> {
 export async function loadPage(id: string): Promise<PageSnapshot | null> {
   if (hasBlobStorage()) {
     try {
-      const meta = await head(blobPath(id));
-      const res = await fetch(meta.url);
-      if (!res.ok) return null;
-      return (await res.json()) as PageSnapshot;
-    } catch {
+      const result = await get(blobPath(id), { access: "private" });
+      if (!result || result.statusCode !== 200 || !result.stream) {
+        return null;
+      }
+      const text = await streamToText(result.stream);
+      return JSON.parse(text) as PageSnapshot;
+    } catch (error) {
+      console.error(`Failed to load page ${id} from blob:`, error);
       return null;
     }
   }

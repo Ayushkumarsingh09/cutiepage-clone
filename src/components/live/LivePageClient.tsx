@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import TemplateRenderer from "@/components/templates/TemplateRenderer";
-import { loadPublishedLocal } from "@/lib/page-share";
+import { decodePage, loadPublishedLocal, readEncodedFromHash } from "@/lib/page-share";
 import type { PageSnapshot } from "@/types";
 
 interface LivePageClientProps {
@@ -15,6 +15,15 @@ export function LivePageClient({ pageId }: LivePageClientProps) {
 
   useEffect(() => {
     async function load() {
+      const encoded = readEncodedFromHash();
+      if (encoded) {
+        const decoded = decodePage(encoded);
+        if (decoded) {
+          setSnapshot(decoded);
+          return;
+        }
+      }
+
       try {
         const res = await fetch(`/api/pages/${pageId}`);
         if (res.ok) {
@@ -23,7 +32,7 @@ export function LivePageClient({ pageId }: LivePageClientProps) {
           return;
         }
       } catch {
-        // fall through to local storage
+        // fall through
       }
 
       const local = loadPublishedLocal(pageId);
@@ -36,6 +45,10 @@ export function LivePageClient({ pageId }: LivePageClientProps) {
     }
 
     load();
+
+    const onHashChange = () => load();
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
   }, [pageId]);
 
   if (error) {
