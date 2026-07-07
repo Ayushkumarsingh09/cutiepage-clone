@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import TemplateRenderer from "@/components/templates/TemplateRenderer";
+import {
+  buildShareUrl,
+  loadDraftLocal,
+} from "@/lib/page-share";
 import { createSnapshotFromTemplate } from "@/lib/snapshot";
 import { getTemplate } from "@/lib/templates";
 import type { PageSnapshot } from "@/types";
@@ -22,10 +26,9 @@ export function PreviewClient({ slug }: PreviewClientProps) {
   useEffect(() => {
     async function load() {
       if (draftId) {
-        const draft = localStorage.getItem(`draft-${draftId}`);
-        if (draft) {
-          const parsed = JSON.parse(draft) as PageSnapshot;
-          setSnapshot({ ...parsed, password: undefined });
+        const local = loadDraftLocal(draftId);
+        if (local) {
+          setSnapshot({ ...local, password: undefined });
           return;
         }
         const res = await fetch(`/api/pages/${draftId}`);

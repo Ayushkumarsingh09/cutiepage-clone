@@ -6,6 +6,12 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, Rocket, Save } from "lucide-react";
 import { EditorField } from "@/components/editor/EditorField";
 import { ShareModal } from "@/components/editor/ShareModal";
+import {
+  buildShareUrl,
+  loadDraftLocal,
+  saveDraftLocal,
+  savePublishedLocal,
+} from "@/lib/page-share";
 import { createSnapshotFromTemplate, updateSectionValue } from "@/lib/snapshot";
 import { getTemplate } from "@/lib/templates";
 import type { PageSnapshot } from "@/types";
@@ -24,24 +30,30 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
   const [status, setStatus] = useState("");
 
   useEffect(() => {
     async function load() {
       if (pageId) {
-        const res = await fetch(`/api/pages/${pageId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setSnapshot(data.page);
-          setPassword(data.page.password ?? "");
+        const local = loadDraftLocal(pageId);
+        if (local) {
+          setSnapshot(local);
+          setPassword(local.password ?? "");
           return;
         }
-        const draft = localStorage.getItem(`draft-${pageId}`);
-        if (draft) {
-          const parsed = JSON.parse(draft) as PageSnapshot;
-          setSnapshot(parsed);
-          setPassword(parsed.password ?? "");
-          return;
+
+        try {
+          const res = await fetch(`/api/pages/${pageId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setSnapshot(data.page);
+            setPassword(data.page.password ?? "");
+            saveDraftLocal(data.page);
+            return;
+          }
+        } catch {
+          // API unavailable on serverless — localStorage is primary
         }
       }
 
@@ -83,20 +95,36 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
     );
   }
 
+  function persistLocally(next: PageSnapshot) {
+    saveDraftLocal(next);
+    setSnapshot(next);
+  }
+
+  async function tryServerSave(next: PageSnapshot) {
+    try {
+      const method = pageId ? "PUT" : "POST";
+      await fetch(pageId ? `/api/pages/${next.id}` : "/api/pages", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(next),
+      });
+    } catch {
+      // Server save is optional — works locally, not on Vercel filesystem
+    }
+  }
+
   async function saveDraft() {
     if (!snapshot) return;
     setSaving(true);
     setStatus("");
     try {
-      const draft = { ...snapshot, password: password || snapshot.password };
-      localStorage.setItem(`draft-${snapshot.id}`, JSON.stringify(draft));
-      const method = pageId ? "PUT" : "POST";
-      const res = await fetch(pageId ? `/api/pages/${snapshot.id}` : "/api/pages", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
-      });
-      if (!res.ok) throw new Error("Save failed");
+      const draft: PageSnapshot = {
+        ...snapshot,
+        password: password || snapshot.password,
+        updatedAt: new Date().toISOString(),
+      };
+      persistLocally(draft);
+      await tryServerSave(draft);
       setStatus("Saved!");
       if (!pageId) {
         router.replace(`/create/${slug}?id=${snapshot.id}`);
@@ -113,21 +141,20 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
     setPublishing(true);
     setStatus("");
     try {
-      const published = {
+      const published: PageSnapshot = {
         ...snapshot,
         password: password || undefined,
         updatedAt: new Date().toISOString(),
       };
-      localStorage.setItem(`draft-${snapshot.id}`, JSON.stringify(published));
-      const method = pageId ? "PUT" : "POST";
-      const res = await fetch(pageId ? `/api/pages/${snapshot.id}` : "/api/pages", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(published),
-      });
-      if (!res.ok) throw new Error("Publish failed");
+      savePublishedLocal(published);
       setSnapshot(published);
+      await tryServerSave(published);
+
+      const url = buildShareUrl(published);
+      setShareUrl(url);
       setShareOpen(true);
+      setStatus("Published! Share your link below.");
+
       if (!pageId) {
         router.replace(`/create/${slug}?id=${snapshot.id}`);
       }
@@ -227,19 +254,24 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
                   <EditorField
                     key={field.id}
                     field={field}
-                    value={snapshot.sections.find((s) => s.id === currentSection.id)?.values[field.id] ?? ""}
+                    value={
+                      snapshot.sections.find((s) => s.id === currentSection.id)?.values[field.id] ??
+                      ""
+                    }
                     onChange={(value) => updateField(field.id, value)}
                   />
                 ))}
               </div>
             </>
           )}
-          {status && <p className="mt-4 text-sm font-medium text-[var(--color-violet)]">{status}</p>}
+          {status && (
+            <p className="mt-4 text-sm font-medium text-[var(--color-violet)]">{status}</p>
+          )}
         </main>
       </div>
 
       <ShareModal
-        pageId={snapshot.id}
+        shareUrl={shareUrl}
         title={snapshot.title}
         open={shareOpen}
         onClose={() => setShareOpen(false)}

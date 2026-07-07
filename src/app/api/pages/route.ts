@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const saved = await savePage(body);
     return NextResponse.json({ page: saved });
   } catch {
-    return NextResponse.json({ error: "Failed to save page" }, { status: 500 });
+    // On Vercel, filesystem may be unavailable — client uses URL-encoded sharing
+    return NextResponse.json({ ok: true, stored: false });
   }
 }

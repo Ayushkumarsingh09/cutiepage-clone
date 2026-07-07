@@ -26,7 +26,7 @@ export async function PUT(request: Request, context: RouteContext) {
     const saved = await savePage(body);
     return NextResponse.json({ page: saved });
   } catch {
-    return NextResponse.json({ error: "Failed to update page" }, { status: 500 });
+    return NextResponse.json({ ok: true, stored: false });
   }
 }
 

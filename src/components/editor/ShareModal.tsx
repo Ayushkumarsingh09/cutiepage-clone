@@ -2,35 +2,32 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { Check, Copy, Download, QrCode, Share2, X } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, QrCode, Share2, X } from "lucide-react";
 
 interface ShareModalProps {
-  pageId: string;
+  shareUrl: string;
   title: string;
   open: boolean;
   onClose: () => void;
 }
 
-export function ShareModal({ pageId, title, open, onClose }: ShareModalProps) {
-  const [url, setUrl] = useState("");
+export function ShareModal({ shareUrl, title, open, onClose }: ShareModalProps) {
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!open || typeof window === "undefined") return;
-    const shareUrl = `${window.location.origin}/p/${pageId}`;
-    setUrl(shareUrl);
+    if (!open || !shareUrl) return;
     QRCode.toDataURL(shareUrl, {
       width: 280,
       margin: 2,
       color: { dark: "#5b3fe8", light: "#ffffff" },
     }).then(setQrDataUrl);
-  }, [open, pageId]);
+  }, [open, shareUrl]);
 
-  if (!open) return null;
+  if (!open || !shareUrl) return null;
 
   async function copyLink() {
-    await navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -44,7 +41,7 @@ export function ShareModal({ pageId, title, open, onClose }: ShareModalProps) {
 
   async function nativeShare() {
     if (navigator.share) {
-      await navigator.share({ title, text: "A special page made for you", url });
+      await navigator.share({ title, text: "A special page made for you 💕", url: shareUrl });
     } else {
       copyLink();
     }
@@ -52,11 +49,11 @@ export function ShareModal({ pageId, title, open, onClose }: ShareModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Share2 className="size-5 text-[var(--color-violet)]" />
-            <h2 className="font-display text-xl font-semibold">Share your page</h2>
+            <h2 className="font-display text-xl font-semibold">Your page is live!</h2>
           </div>
           <button
             type="button"
@@ -69,7 +66,8 @@ export function ShareModal({ pageId, title, open, onClose }: ShareModalProps) {
         </div>
 
         <p className="mb-4 text-sm text-[var(--color-dim)]">
-          Your page is live. Copy the link or download the QR code to share anywhere.
+          Copy this link and send it to someone special. They can open it on any phone or
+          computer — no app needed.
         </p>
 
         {qrDataUrl && (
@@ -77,21 +75,21 @@ export function ShareModal({ pageId, title, open, onClose }: ShareModalProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qrDataUrl} alt="QR code" className="size-48" />
             <p className="mt-2 flex items-center gap-1 text-xs text-[var(--color-dim)]">
-              <QrCode className="size-3.5" /> Live QR code
+              <QrCode className="size-3.5" /> Scan to open
             </p>
           </div>
         )}
 
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
           <input
             readOnly
-            value={url}
-            className="flex-1 bg-transparent text-sm outline-none"
+            value={shareUrl}
+            className="flex-1 break-all bg-transparent text-xs outline-none"
           />
           <button
             type="button"
             onClick={copyLink}
-            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-violet)] px-3 py-1.5 text-xs font-semibold text-white"
+            className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-[var(--color-violet)] px-3 py-1.5 text-xs font-semibold text-white"
           >
             {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
             {copied ? "Copied" : "Copy"}
@@ -114,6 +112,15 @@ export function ShareModal({ pageId, title, open, onClose }: ShareModalProps) {
             <Share2 className="size-4" /> Share
           </button>
         </div>
+
+        <a
+          href={shareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-violet-200 py-2.5 text-sm font-semibold text-[var(--color-violet)] hover:bg-violet-50"
+        >
+          <ExternalLink className="size-4" /> Open live page
+        </a>
       </div>
     </div>
   );

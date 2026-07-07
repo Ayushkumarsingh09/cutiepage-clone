@@ -1,8 +1,17 @@
 import { promises as fs } from "fs";
 import path from "path";
+import os from "os";
 import type { PageSnapshot, PublishedPageMeta } from "@/types";
 
-const DATA_DIR = path.join(process.cwd(), "data", "pages");
+function getDataDir() {
+  // Vercel serverless has read-only filesystem except /tmp
+  if (process.env.VERCEL) {
+    return path.join(os.tmpdir(), "cutiepage-pages");
+  }
+  return path.join(process.cwd(), "data", "pages");
+}
+
+const DATA_DIR = getDataDir();
 
 async function ensureDataDir() {
   await fs.mkdir(DATA_DIR, { recursive: true });
@@ -32,30 +41,34 @@ export async function getPage(id: string): Promise<PageSnapshot | null> {
 }
 
 export async function listPages(): Promise<PublishedPageMeta[]> {
-  await ensureDataDir();
-  const files = await fs.readdir(DATA_DIR);
-  const pages: PublishedPageMeta[] = [];
+  try {
+    await ensureDataDir();
+    const files = await fs.readdir(DATA_DIR);
+    const pages: PublishedPageMeta[] = [];
 
-  for (const file of files) {
-    if (!file.endsWith(".json")) continue;
-    try {
-      const raw = await fs.readFile(path.join(DATA_DIR, file), "utf8");
-      const page = JSON.parse(raw) as PageSnapshot;
-      pages.push({
-        id: page.id,
-        templateSlug: page.templateSlug,
-        title: page.title,
-        hasPassword: Boolean(page.password),
-        createdAt: page.createdAt,
-      });
-    } catch {
-      // skip invalid files
+    for (const file of files) {
+      if (!file.endsWith(".json")) continue;
+      try {
+        const raw = await fs.readFile(path.join(DATA_DIR, file), "utf8");
+        const page = JSON.parse(raw) as PageSnapshot;
+        pages.push({
+          id: page.id,
+          templateSlug: page.templateSlug,
+          title: page.title,
+          hasPassword: Boolean(page.password),
+          createdAt: page.createdAt,
+        });
+      } catch {
+        // skip invalid files
+      }
     }
-  }
 
-  return pages.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+    return pages.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function deletePage(id: string): Promise<boolean> {
