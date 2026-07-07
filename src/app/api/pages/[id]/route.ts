@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { deletePage, getPage, savePage } from "@/lib/storage";
+import { loadPage, storePage } from "@/lib/page-store";
+import { deletePage } from "@/lib/storage";
 import type { PageSnapshot } from "@/types";
 
 interface RouteContext {
@@ -8,7 +9,7 @@ interface RouteContext {
 
 export async function GET(_request: Request, context: RouteContext) {
   const { id } = await context.params;
-  const page = await getPage(id);
+  const page = await loadPage(id);
   if (!page) {
     return NextResponse.json({ error: "Page not found" }, { status: 404 });
   }
@@ -23,10 +24,11 @@ export async function PUT(request: Request, context: RouteContext) {
     if (body.id !== id) {
       return NextResponse.json({ error: "ID mismatch" }, { status: 400 });
     }
-    const saved = await savePage(body);
-    return NextResponse.json({ page: saved });
-  } catch {
-    return NextResponse.json({ ok: true, stored: false });
+    const saved = await storePage(body);
+    return NextResponse.json({ page: saved, stored: true });
+  } catch (error) {
+    console.error("Failed to update page:", error);
+    return NextResponse.json({ error: "Failed to update page" }, { status: 500 });
   }
 }
 

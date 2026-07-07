@@ -100,16 +100,19 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
     setSnapshot(next);
   }
 
-  async function tryServerSave(next: PageSnapshot) {
+  async function tryServerSave(next: PageSnapshot): Promise<boolean> {
     try {
       const method = pageId ? "PUT" : "POST";
-      await fetch(pageId ? `/api/pages/${next.id}` : "/api/pages", {
+      const res = await fetch(pageId ? `/api/pages/${next.id}` : "/api/pages", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(next),
       });
+      if (!res.ok) return false;
+      const data = await res.json();
+      return Boolean(data.stored ?? data.page);
     } catch {
-      // Server save is optional — works locally, not on Vercel filesystem
+      return false;
     }
   }
 
@@ -124,8 +127,8 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
         updatedAt: new Date().toISOString(),
       };
       persistLocally(draft);
-      await tryServerSave(draft);
-      setStatus("Saved!");
+      const stored = await tryServerSave(draft);
+      setStatus(stored ? "Saved!" : "Saved locally!");
       if (!pageId) {
         router.replace(`/create/${slug}?id=${snapshot.id}`);
       }
@@ -148,12 +151,17 @@ export function EditorClient({ slug, pageId }: EditorClientProps) {
       };
       savePublishedLocal(published);
       setSnapshot(published);
-      await tryServerSave(published);
+
+      const stored = await tryServerSave(published);
+      if (!stored) {
+        setStatus("Publish failed — could not save to server. Try again.");
+        return;
+      }
 
       const url = buildShareUrl(published);
       setShareUrl(url);
       setShareOpen(true);
-      setStatus("Published! Share your link below.");
+      setStatus("Published! Share your short link below.");
 
       if (!pageId) {
         router.replace(`/create/${slug}?id=${snapshot.id}`);

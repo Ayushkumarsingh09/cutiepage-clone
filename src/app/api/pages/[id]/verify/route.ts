@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPage } from "@/lib/storage";
+import { loadPage } from "@/lib/page-store";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -7,7 +7,7 @@ interface RouteContext {
 
 export async function POST(request: Request, context: RouteContext) {
   const { id } = await context.params;
-  const page = await getPage(id);
+  const page = await loadPage(id);
   if (!page) {
     return NextResponse.json({ error: "Page not found" }, { status: 404 });
   }

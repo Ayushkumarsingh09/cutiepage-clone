@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { listPages, savePage } from "@/lib/storage";
+import { storePage } from "@/lib/page-store";
+import { listPages } from "@/lib/storage";
 import type { PageSnapshot } from "@/types";
 
 export async function GET() {
@@ -13,10 +14,10 @@ export async function POST(request: Request) {
     if (!body.id || !body.templateSlug || !body.sections) {
       return NextResponse.json({ error: "Invalid page data" }, { status: 400 });
     }
-    const saved = await savePage(body);
-    return NextResponse.json({ page: saved });
-  } catch {
-    // On Vercel, filesystem may be unavailable — client uses URL-encoded sharing
-    return NextResponse.json({ ok: true, stored: false });
+    const saved = await storePage(body);
+    return NextResponse.json({ page: saved, stored: true });
+  } catch (error) {
+    console.error("Failed to save page:", error);
+    return NextResponse.json({ error: "Failed to save page" }, { status: 500 });
   }
 }

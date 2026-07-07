@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import TemplateRenderer from "@/components/templates/TemplateRenderer";
-import {
-  decodePage,
-  loadPublishedLocal,
-  readEncodedFromHash,
-} from "@/lib/page-share";
+import { loadPublishedLocal } from "@/lib/page-share";
 import type { PageSnapshot } from "@/types";
 
 interface LivePageClientProps {
@@ -19,24 +15,6 @@ export function LivePageClient({ pageId }: LivePageClientProps) {
 
   useEffect(() => {
     async function load() {
-      // 1. Page data embedded in URL hash (works on Vercel, shareable cross-device)
-      const encoded = readEncodedFromHash();
-      if (encoded) {
-        const decoded = decodePage(encoded);
-        if (decoded) {
-          setSnapshot(decoded);
-          return;
-        }
-      }
-
-      // 2. Local browser storage (same device as creator)
-      const local = loadPublishedLocal(pageId);
-      if (local) {
-        setSnapshot(local);
-        return;
-      }
-
-      // 3. Server file storage (local dev only)
       try {
         const res = await fetch(`/api/pages/${pageId}`);
         if (res.ok) {
@@ -45,19 +23,19 @@ export function LivePageClient({ pageId }: LivePageClientProps) {
           return;
         }
       } catch {
-        // ignore
+        // fall through to local storage
       }
 
-      setError(
-        "This page could not be found. Make sure you opened the full share link from the creator.",
-      );
+      const local = loadPublishedLocal(pageId);
+      if (local) {
+        setSnapshot(local);
+        return;
+      }
+
+      setError("This page could not be found. Ask the sender to share the link again.");
     }
 
     load();
-
-    const onHashChange = () => load();
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
   }, [pageId]);
 
   if (error) {
