@@ -4,6 +4,12 @@ A fully functional, self-hostable clone of [cutiepage.in](https://www.cutiepage.
 
 **No login, signup, payment, or pricing.** All templates are free to create, customise, publish, and share.
 
+## Live links
+
+- **Live site:** https://cutiepage-clone.vercel.app
+- **GitHub:** https://github.com/Ayushkumarsingh09/cutiepage-clone
+- **Vercel dashboard:** https://vercel.com/ayushs-projects-e5782a01/cutiepage-clone
+
 ## Features
 
 - 20 interactive templates (birthday, anniversary, wedding, apology, love notes, and more)
@@ -22,7 +28,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3001](http://localhost:3001)
 
 ## How it works
 
