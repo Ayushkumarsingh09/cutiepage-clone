@@ -6,9 +6,12 @@ Customisable gift pages for birthdays, anniversaries, apologies, and more — be
 
 ## Live links
 
-- **Live site:** https://chayan.vercel.app
+- **Live site:** https://chayan-app.vercel.app
+- **Also available:** https://chayan-gift.vercel.app
 - **GitHub:** https://github.com/Ayushkumarsingh09/chayan
 - **Vercel dashboard:** https://vercel.com/ayushs-projects-e5782a01/chayan
+
+> Note: `chayan.vercel.app` is already taken by another project on Vercel, so the app uses `chayan-app.vercel.app` as its primary URL.
 
 ## Features
 
