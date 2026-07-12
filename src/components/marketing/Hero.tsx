@@ -63,14 +63,8 @@ export default function Hero() {
           <div className="relative overflow-hidden rounded-2xl border border-violet/15 bg-white p-2 shadow-2xl shadow-violet/15 sm:rounded-3xl sm:p-3">
             <div className="aspect-[16/9] overflow-hidden rounded-xl bg-gradient-to-br from-violet/5 via-white to-electric/5 sm:rounded-2xl">
               <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
-                <div className="animate-float flex h-20 w-20 items-center justify-center rounded-2xl gradient-bg text-white shadow-lg shadow-violet/30">
-                  <Heart className="h-10 w-10" />
-                </div>
                 <p className="font-display text-2xl font-semibold text-foreground sm:text-3xl">
-                  Happy Birthday, Priya! 🎂
-                </p>
-                <p className="max-w-md text-center text-dim">
-                  A tiny website made with love — just for you.
+                  Chayan
                 </p>
               </div>
             </div>
