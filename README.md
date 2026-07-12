@@ -1,14 +1,14 @@
-# Cutiepage Clone
+# Chayan
 
-A fully functional, self-hostable clone of [cutiepage.in](https://www.cutiepage.in/) — customisable gift pages for birthdays, anniversaries, apologies, and more.
+Customisable gift pages for birthdays, anniversaries, apologies, and more — beautiful templates you can personalise and share in minutes.
 
 **No login, signup, payment, or pricing.** All templates are free to create, customise, publish, and share.
 
 ## Live links
 
-- **Live site:** https://cutiepage-clone.vercel.app
-- **GitHub:** https://github.com/Ayushkumarsingh09/cutiepage-clone
-- **Vercel dashboard:** https://vercel.com/ayushs-projects-e5782a01/cutiepage-clone
+- **Live site:** https://chayan.vercel.app
+- **GitHub:** https://github.com/Ayushkumarsingh09/chayan
+- **Vercel dashboard:** https://vercel.com/ayushs-projects-e5782a01/chayan
 
 ## Features
 
@@ -23,7 +23,7 @@ A fully functional, self-hostable clone of [cutiepage.in](https://www.cutiepage.
 ## Quick start
 
 ```bash
-cd cutiepage-clone
+cd chayan
 npm install
 npm run dev
 ```
@@ -40,20 +40,14 @@ Open [http://localhost:3001](http://localhost:3001)
 
 ## Deploy to Vercel
 
-1. Push this folder to GitHub
+1. Push this repo to GitHub
 2. Import the repo in [Vercel](https://vercel.com)
-3. Deploy — no environment variables required
+3. Add environment variables:
+   - `BLOB_READ_WRITE_TOKEN` — Vercel Blob read/write token
+   - `BLOB_STORE_ID` — your Blob store ID
+4. Deploy
 
-Published pages are stored in `data/pages/` as JSON files. On Vercel, use a persistent store for production:
-
-- **Option A:** Vercel Blob or KV (recommended for production)
-- **Option B:** Supabase free tier
-- **Option C:** Keep file storage for local/self-hosted Node.js
-
-For **Hostinger shared hosting**, build statically won't work for the API routes. Use either:
-
-- Host the Next.js app on Vercel (free) and point your domain there
-- Or use Hostinger's Node.js hosting if available
+Published pages are stored in Vercel Blob for short shareable links (`/p/[id]`). Drafts are also saved to browser `localStorage` for recovery.
 
 ## Project structure
 
@@ -64,9 +58,8 @@ src/
     editor/         # Template editor and share modal
     marketing/      # Homepage sections
     templates/      # Template renderers (20 templates)
-  data/             # Template registry (extracted from cutiepage)
+  data/             # Template registry
   lib/              # Storage, snapshots, utilities
-data/pages/         # Published pages (JSON)
 ```
 
 ## API
@@ -86,10 +79,9 @@ Birthday Wish 01–04, Birthday Wish 02, Cute Birthday, Sweet Birthday, Love Not
 
 ## Notes
 
-- Template media (images, GIFs, music) loads from `cdn.cutiepage.in` public CDN
+- Template media (images, GIFs, music) loads from public CDN URLs in the template registry
 - For custom photos, paste any public image URL in the editor
-- Drafts are also saved to browser `localStorage` for recovery
 
 ## License
 
-For personal/educational use. Cutiepage is a commercial product by Pinak Kundu; this is an independent recreation without login or payment flows.
+For personal/educational use.

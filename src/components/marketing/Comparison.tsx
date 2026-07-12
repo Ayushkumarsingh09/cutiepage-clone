@@ -1,14 +1,14 @@
 import { Check, X } from "lucide-react";
 
 const features = [
-  { name: "Beautiful templates", cutiepage: true, diy: false, cards: false },
-  { name: "Personalised photos & messages", cutiepage: true, diy: true, cards: true },
-  { name: "Music & animations", cutiepage: true, diy: false, cards: false },
-  { name: "QR code included", cutiepage: true, diy: false, cards: false },
-  { name: "Ready in 30 seconds", cutiepage: true, diy: false, cards: true },
-  { name: "Lifetime validity", cutiepage: true, diy: true, cards: false },
-  { name: "Editable anytime", cutiepage: true, diy: true, cards: false },
-  { name: "Mobile-optimised", cutiepage: true, diy: false, cards: false },
+  { name: "Beautiful templates", chayan: true, diy: false, cards: false },
+  { name: "Personalised photos & messages", chayan: true, diy: true, cards: true },
+  { name: "Music & animations", chayan: true, diy: false, cards: false },
+  { name: "QR code included", chayan: true, diy: false, cards: false },
+  { name: "Ready in 30 seconds", chayan: true, diy: false, cards: true },
+  { name: "Lifetime validity", chayan: true, diy: true, cards: false },
+  { name: "Editable anytime", chayan: true, diy: true, cards: false },
+  { name: "Mobile-optimised", chayan: true, diy: false, cards: false },
 ];
 
 function Cell({ value, highlight }: { value: boolean; highlight?: boolean }) {
@@ -31,7 +31,7 @@ export default function Comparison() {
       <div className="mx-auto max-w-4xl">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wider text-violet">
-            Why Cutiepage?
+            Why Chayan?
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
             More meaningful than a text
@@ -50,7 +50,7 @@ export default function Comparison() {
                 </th>
                 <th className="px-4 py-4 text-center">
                   <span className="inline-flex rounded-full gradient-bg px-4 py-1.5 text-xs font-semibold text-white">
-                    Cutiepage
+                    Chayan
                   </span>
                 </th>
                 <th className="px-4 py-4 text-center font-medium text-dim">
@@ -70,7 +70,7 @@ export default function Comparison() {
                   <td className="px-4 py-4 font-medium text-foreground">
                     {feature.name}
                   </td>
-                  <Cell value={feature.cutiepage} highlight />
+                  <Cell value={feature.chayan} highlight />
                   <Cell value={feature.diy} />
                   <Cell value={feature.cards} />
                 </tr>

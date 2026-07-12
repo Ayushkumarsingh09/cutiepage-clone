@@ -15,7 +15,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Cutiepage Clone - Customisable gift pages",
+  title: "Chayan - Customisable gift pages",
   description:
     "Create beautiful, personalised gift pages in minutes. Choose a template, customise it, and share with someone special.",
 };

@@ -11,7 +11,7 @@ export default function Footer() {
               <span className="flex h-8 w-8 items-center justify-center rounded-lg gradient-bg text-white">
                 <Sparkles className="h-3.5 w-3.5" />
               </span>
-              <span className="font-display text-lg font-semibold">Cutiepage</span>
+              <span className="font-display text-lg font-semibold">Chayan</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-dim">
               Create beautiful, personalised gift pages for the people you love — in minutes.
@@ -66,7 +66,7 @@ export default function Footer() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-violet/10 pt-8 sm:flex-row">
           <p className="text-sm text-slate">
-            © {new Date().getFullYear()} Cutiepage Clone. All rights reserved.
+            © {new Date().getFullYear()} Chayan. All rights reserved.
           </p>
           <p className="flex items-center gap-1.5 text-sm text-slate">
             Made with <Heart className="h-3.5 w-3.5 fill-violet text-violet" /> for special moments

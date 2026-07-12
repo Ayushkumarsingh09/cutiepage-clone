@@ -2,7 +2,7 @@ import TemplateCard from "@/components/marketing/TemplateCard";
 import { getAllTemplates } from "@/lib/templates";
 
 export const metadata = {
-  title: "Templates - Cutiepage Clone",
+  title: "Templates - Chayan",
   description: "Browse all gift page templates for birthdays, anniversaries, apologies, and more.",
 };
 

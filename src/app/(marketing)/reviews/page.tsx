@@ -3,7 +3,7 @@ import CTA from "@/components/marketing/CTA";
 import { reviews } from "@/lib/reviews";
 
 export const metadata = {
-  title: "Reviews - Cutiepage Clone",
+  title: "Reviews - Chayan",
   description: "Read what creators are saying about their gift pages.",
 };
 

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps) {
   const template = getTemplate(slug);
   if (!template) return { title: "Template not found" };
   return {
-    title: `${template.name} - Cutiepage Clone`,
+    title: `${template.name} - Chayan`,
     description: template.description,
   };
 }

@@ -25,7 +25,7 @@ export default function Header() {
             <Sparkles className="h-4 w-4" />
           </span>
           <span className="font-display text-xl font-semibold tracking-tight text-foreground">
-            Cutiepage
+            Chayan
           </span>
         </Link>
 

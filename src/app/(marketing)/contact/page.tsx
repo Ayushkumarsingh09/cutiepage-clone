@@ -2,7 +2,7 @@ import { Mail, MessageCircle, Clock } from "lucide-react";
 import ContactForm from "@/components/marketing/ContactForm";
 
 export const metadata = {
-  title: "Contact - Cutiepage Clone",
+  title: "Contact - Chayan",
   description: "Get in touch with our team for help or questions.",
 };
 
@@ -10,7 +10,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email us",
-    description: "hello@cutiepage.clone",
+    description: "hello@chayan.app",
     detail: "We respond within 24 hours",
   },
   {

@@ -6,7 +6,7 @@ import type { PageSnapshot, PublishedPageMeta } from "@/types";
 function getDataDir() {
   // Vercel serverless has read-only filesystem except /tmp
   if (process.env.VERCEL) {
-    return path.join(os.tmpdir(), "cutiepage-pages");
+    return path.join(os.tmpdir(), "chayan-pages");
   }
   return path.join(process.cwd(), "data", "pages");
 }
